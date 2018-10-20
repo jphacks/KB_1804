@@ -1,6 +1,10 @@
 const clova = require('@line/clova-cek-sdk-nodejs');
 const express = require('express');
 
+//
+const app = new express();
+const port = process.env.PORT || 3000;
+
 const clovaSkillHandler = clova.Client
     .configureSkill()
 
@@ -9,7 +13,7 @@ const clovaSkillHandler = clova.Client
         responseHelper.setSimpleSpeech({
             lang: 'ja',
             type: 'PlainText',
-            value: 'はーい，わったいさま',
+            value: 'てくてくクローバを起動しました',
         });
     })
 
@@ -26,8 +30,9 @@ const clovaSkillHandler = clova.Client
           let speech = {
             lang: 'ja',
             type: 'PlainText',
-            value: `わったいさん許してください．おねがいします．`
+            value: `はーい`
           }
+
 /*          if(slots.area === '秋葉原'){
             speech.value = `${slots.area}のオススメのカレー屋は フジヤマドラゴンカレー です。`;
           }else if(slots.area === '神保町'){
@@ -37,8 +42,10 @@ const clovaSkillHandler = clova.Client
           //何か自分で書いてみましょう。
         }
 */
+        app.get('/rpi', (req, res) => res.send('Hello Python'));
         responseHelper.setSimpleSpeech(speech);
         responseHelper.setSimpleSpeech(speech, true);
+
       }
     })
 
@@ -48,12 +55,12 @@ const clovaSkillHandler = clova.Client
     })
     .handle();
 
-
-const app = new express();
-const port = process.env.PORT || 3000;
+// const app = new express();
+// const port = process.env.PORT || 3000;
 
 //リクエストの検証を行う場合。環境変数APPLICATION_ID(値はClova Developer Center上で入力したExtension ID)が必須
 const clovaMiddleware = clova.Middleware({applicationId: 'com.techtech.ubi'});
 app.post('/clova', clovaMiddleware, clovaSkillHandler);
+// app.get('/rpi', (req, res) => res.send('Hello Python'));
 
 app.listen(port, () => console.log(`Server running on ${port}`));
