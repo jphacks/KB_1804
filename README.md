@@ -1,9 +1,9 @@
 # TekuTeku Clova
 
-![Product Name]
+![TechTech Clova]
 
 ## 製品概要
-### IYASI Tech（X → 今回皆さんが選定した好きな言葉に書き換えてください）
+### いやし × Tech（X → 今回皆さんが選定した好きな言葉に書き換えてください）
 
 ### 背景
 - clovaかわいい
