@@ -1,52 +1,86 @@
 const clova = require('@line/clova-cek-sdk-nodejs');
 const express = require('express');
 
-//
 const app = new express();
 const port = process.env.PORT || 3000;
+
+var n = 0;
+
+app.get('/rpi' + String(n), function (req, res, next) {
+  res.send('yyy_' + String(n));
+  //next();
+});
+
+// request.post({
+//   url:     'https://4b9a3cba.ngrok.io',
+//   form:    { mes: "heydude" }
+// }, function(error, response, body){
+//   console.log(body);
+// });
 
 const clovaSkillHandler = clova.Client
     .configureSkill()
 
     //起動時に喋る
     .onLaunchRequest(responseHelper => {
-        responseHelper.setSimpleSpeech({
-            lang: 'ja',
-            type: 'PlainText',
-            value: 'てくてくクローバを起動しました',
-        });
+      responseHelper.setSimpleSpeech({
+          lang: 'ja',
+          type: 'PlainText',
+          value: 'てくてくクローバを起動しました',
+      });
+      app.get('/rpi' + String(n), function (req, res, next) {
+        res.send('none_' + String(n));
+        //next();
+      });
+      n++;
     })
+
 
     //ユーザーからの発話が来たら反応する箇所
     .onIntentRequest(async responseHelper => {
-        const intent = responseHelper.getIntentName();
-        const sessionId = responseHelper.getSessionId();
+      const intent = responseHelper.getIntentName();
+      const sessionId = responseHelper.getSessionId();
+      console.log('Intent:' + intent);
 
-        console.log('Intent:' + intent);
-        if(intent === 'follow_me'){
-          const slots = responseHelper.getSlots();
+      //デフォルト
+      let speech = {
+        lang: 'ja',
+        type: 'PlainText',
+        value: ``
+      }
+      const slots = responseHelper.getSlots();
+
+      switch (intent) {
+        case 'follow_me':
           //console.log(slots);
-          //デフォルトのスピーチ内容を記載 - 該当スロットがない場合をデフォルト設定
-          let speech = {
-            lang: 'ja',
-            type: 'PlainText',
-            value: `はーい`
-          }
+          speech.value = `待ってー，今行くね`;
+          //ラズパイが/rpiにGETを送るとrunを返す
+          app.get('/rpi'+ String(n), function (req, res, next) {
+            res.send('run_' + String(n));
+            //next();
+          });
+          console.log('run' + String(n));
+          break;
 
-/*          if(slots.area === '秋葉原'){
-            speech.value = `${slots.area}のオススメのカレー屋は フジヤマドラゴンカレー です。`;
-          }else if(slots.area === '神保町'){
-            speech.value = `${slots.area}のオススメのカレー屋は 共栄堂 です。`;
-          }else if(slots.area === '神田'){
-            //神田のカレー情報検索
-          //何か自分で書いてみましょう。
-        }
-*/
-        app.get('/rpi', (req, res) => res.send('Hello Python'));
-        responseHelper.setSimpleSpeech(speech);
-        responseHelper.setSimpleSpeech(speech, true);
+        case 'stop_clova':
+          //const slots = responseHelper.getSlots();
+          //console.log(slots);
+          speech.value = `分かった、止まるね`;
+          //ラズパイが/rpiにGETを送るとstopを返す
+          app.get('/rpi'+ String(n), function (req, res, next) {
+            res.send('stop_'+ String(n));
+            //next();
+          });
+          console.log('stop'+ String(n));
+          break;
+
+        default:
+          speech.value = `ごめん、もう一回言って？`;
 
       }
+      responseHelper.setSimpleSpeech(speech);
+      responseHelper.setSimpleSpeech(speech, true);
+      n = n + 1;
     })
 
     //終了時
