@@ -2,59 +2,50 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from wheel_control import WheelControl
-import RPi.GPIO as GPIO
+##from wheel_control import WheelControl
+##import RPi.GPIO as GPIO
 import time
 
 class OpticalSense:
 
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        self.width = 320 # self.cap.get(3)
-        self.height = 240 # self.cap.get(4)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
-        
-        self.wc = WheelControl()
+        self.width = self.cap.get(3)
+        self.height = self.cap.get(4)
         
     def face2command(self, img):
-        cascade_path = "./haarcascades/haarcascade_frontalface_default.xml"
+        cascade_path = "./haarcascade/haarcascade_frontalcatface.xml"
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         cascade = cv2.CascadeClassifier(cascade_path)
         facerects = cascade.detectMultiScale(img_gray,
-                                            scaleFactor=1.3,
-                                            minNeighbors=5)
+                                            scaleFactor=1.1,
+                                            minNeighbors=1,
+                                            minSize=(100, 100))
         
         x_center = self.width / 2
         print(facerects)
-        
-        # if facerects != ():
-        if len(facerects) == 1:
+        if facerects != ():
             
             x, y = facerects[0][0], facerects[0][1]
             w, h = facerects[0][2], facerects[0][3]
             
             face_center = x + w//2
-            width_ex = 25
+            width_ex = 100
 
             area_img = self.width * self.height
-            
-            print("face_center", face_center)
 
             if face_center < x_center - width_ex:
-                command = "L"
+                command = "Left"
             elif face_center > x_center + width_ex:
-                command = "R"
-            elif w * h > area_img * 0.2:
-                command = "B"
-            elif w * h < area_img * 0.2:
-                command = "F"
+                command = "Right"
+            elif w * h > area_img * 0.5:
+                command = "Backward"
+            elif w * h < area_img * 0.3:
+                command = "Forward"
             else:
-                command =" W"
+                command =" Wait"
         else:
-            command = "W"
-        
-        
+            command = "Wait"
         return command
 
     def red_detect(self, img):
@@ -80,9 +71,9 @@ class OpticalSense:
         ##print(area)
         if mu["m00"] == 0:
             # ＃# print("Not fund")
-            return "W"
+            return "Wait"
         elif area / 100 > (self.width * self.height) / 2:
-            return "B"
+            return "Back"
         else:
             x, y = (mu["m10"] / mu["m00"]), (mu["m01"] / mu["m00"])
 
@@ -93,55 +84,68 @@ class OpticalSense:
 
             # print(x, y)
             if x < 300:
-                return "L"
+                return "Left"
             elif 300 <= x < 500:
-                return "F"
+                return "Forward"
             elif 500 <= x:
-                return "R"
+                return "Right"
 
     def main(self):
-        
+        ##wc = WheelControl()
         while (self.cap.isOpened()):
             # フレームを取得
             ret, frame = self.cap.read()
             
-            command = self.face2command(frame) #############
+            command_ = self.face2command(frame) #############
             
-            """
+            
             # 赤色検出
             mask = self.red_detect(frame)
 
             # 結果表示
-            # cv2.imshow("Frame", frame)
-            # cv2.imshow("Mask", mask)
+            cv2.imshow("Frame", frame)
+            cv2.imshow("Mask", mask)
             command = self.gravity_center(mask)
-            """
+            
 
             if command != None:
-                # print(command)
-                print("try")
-                if(command == "F"):
-                    print(command)
-                    self.wc.forward(duty=20)
-                elif(command == "B"):
-                    print(command)
-                    self.wc.backward(duty=20)
-                elif(command == "L"):
-                    print(command)
-                    self.wc.rotate_left(duty=10)
-                elif(command == "R"):
-                    print(command)
-                    self.wc.rotate_right(duty=10)
-                elif(command == "W"):
-                    print(command)
-                    self.wc.forward(duty=0)
+                print(command)
+                try:
+                    
+                    if(command == "Foward"):
+                        ##wc.forward(duty=100)
+                        print("Foward")
+                        time.sleep(1)
+                    elif(command == "Back"):
+                        ##wc.backward(duty=100)
+                        print("Back")
+                        time.sleep(1)
+                    elif(command == "Left"):
+                        ##wc.rotate_left(duty=50)
+                        print("Left")
+                        time.sleep(1)
+                    elif(command == "Right"):
+                        ##wc.rotate_right(duty=50)
+                        print("Right")
+                        time.sleep(1)
+                    elif(command == "Wait"):
+                        print("Wait")
+                        ##wc.stop()
 
-                print("done")
+                    print("done")
+
+                except:
+                    print("except")
+                    ##GPIO.cleanup()
+
+                finally:
+                    print("fin")
+                    ##GPIO.cleanup()
 
                 # qキーが押されたら途中終了
             #if cv2.waitKey(25) & 0xFF == ord('q'):
             #   break
-            time.sleep(0.1)
+
         self.cap.release()
         # cv2.destroyAllWindows()
 
