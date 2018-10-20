@@ -1,6 +1,6 @@
-from testopencv import OpenCV
+from testopencv import OpticalSense
 
-if __name__ == '__main__':
-    oc = OpenCV()
-    oc.main()
+# if __name__ == '__main__':
+oc = OpticalSense()
+oc.main()
 
