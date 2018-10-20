@@ -82,7 +82,7 @@ class WheelControl:
         self.pwm_A.stop()
         self.pwm_B.stop()
 
-"""
+
 try:
     wc = WheelControl()
     wc.forward(duty=100)
@@ -100,4 +100,3 @@ try:
 finally:
     print("fin")
     GPIO.cleanup()
-"""
