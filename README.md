@@ -1,6 +1,6 @@
 # Techてく Clova
 
-[![Techてく Clova](image.png)](https://drive.google.com/open?id=1jRFcN5NUs_d0dKms6DadkSnS6t0W8Vrw)
+[![Techてく Clova](https://github.com/jphacks/KB_1804/blob/master/clova_side.JPG?raw=true)](https://drive.google.com/open?id=1jRFcN5NUs_d0dKms6DadkSnS6t0W8Vrw)
 
 ## 製品概要
 
@@ -19,6 +19,9 @@
 
 
 ### 製品説明（具体的な製品の説明）
+
+![Techてく Clova](https://github.com/jphacks/KB_1804/blob/master/clova_front.JPG?raw=true)
+
 #### Clovaの移動
 LINE Clovaの移動を可能にするために、キャタピラーの上にClovaを搭載した。これによりユーザとClovaの距離感が近くなり、より親密にClovaと触れ合うことが可能になった。
 #### 人の動きの認識
@@ -30,7 +33,6 @@ LINE Clovaの移動を可能にするために、キャタピラーの上にClov
 - Clovaに「ついてきて」と話しかけるとカメラが人を認識し，その人に追従するように動く．
 
 ### 特長
-
 #### 1. 見た目がかわいいモバイルスマートスピーカー
 愛くるしい見た目と、言ったことを正確に聞き取ってくれる機能を兼ね備えたLINE Clovaがさらに動き回るようになった。
 
