@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 from wheel_control import WheelControl
 import RPi.GPIO as GPIO
 import time
+from check import ClovaChecker
 
-class OpticalSense:
+class DetectAndRun:
 
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
@@ -15,7 +16,12 @@ class OpticalSense:
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
         
-        self.wc = WheelControl()
+        self.dt = 0.05
+        #self.wc = None
+        # self.wc = WheelControl()
+        
+        self.dt_check = 5  # Period to check clova. 
+        self.cc= ClovaChecker()
         
     def face2command(self, img):
         cascade_path = "./haarcascades/haarcascade_frontalface_default.xml"
@@ -86,12 +92,6 @@ class OpticalSense:
         else:
             x, y = (mu["m10"] / mu["m00"]), (mu["m01"] / mu["m00"])
 
-            # cv2.circle(img, (int(x), int(y)), 4, 100, 2, 4)
-            ##plt.imshow(img)
-            ##plt.colorbar()
-            ##plt.show()
-
-            # print(x, y)
             if x < 300:
                 return "L"
             elif 300 <= x < 500:
@@ -99,49 +99,67 @@ class OpticalSense:
             elif 500 <= x:
                 return "R"
 
-    def main(self):
+    def run(self):
         
-        while (self.cap.isOpened()):
-            # フレームを取得
-            ret, frame = self.cap.read()
-            
-            command = self.face2command(frame) #############
-            
-            """
-            # 赤色検出
-            mask = self.red_detect(frame)
+        
+        received_text = self.cc.check()
+        cc_checkpoint = time.time()
+        if received_text == 'run':
+            wc = WheelControl()
+            while (self.cap.isOpened()):
 
-            # 結果表示
-            # cv2.imshow("Frame", frame)
-            # cv2.imshow("Mask", mask)
-            command = self.gravity_center(mask)
-            """
+                # image processing -------------------
+                # フレームを取得
+                ret, frame = self.cap.read()
+                
+                command = self.face2command(frame)            
+                """
+                # 赤色検出
+                mask = self.red_detect(frame)
 
-            if command != None:
-                # print(command)
-                print("try")
-                if(command == "F"):
-                    print(command)
-                    self.wc.forward(duty=20)
-                elif(command == "B"):
-                    print(command)
-                    self.wc.backward(duty=20)
-                elif(command == "L"):
-                    print(command)
-                    self.wc.rotate_left(duty=10)
-                elif(command == "R"):
-                    print(command)
-                    self.wc.rotate_right(duty=10)
-                elif(command == "W"):
-                    print(command)
-                    self.wc.forward(duty=0)
+                # 結果表示
+                # cv2.imshow("Frame", frame)
+                # cv2.imshow("Mask", mask)
+                command = self.gravity_center(mask)
+                """
 
-                print("done")
+                if command != None:
+                    # print(command)
+                    print("try")
+                    if(command == "F"):
+                        print(command)
+                        wc.forward(duty=20)
+                    elif(command == "B"):
+                        print(command)
+                        wc.backward(duty=20)
+                    elif(command == "L"):
+                        print(command)
+                        wc.rotate_left(duty=10)
+                    elif(command == "R"):
+                        print(command)
+                        wc.rotate_right(duty=10)
+                    elif(command == "W"):
+                        print(command)
+                        wc.forward(duty=0)
+
+                    print("done")
 
                 # qキーが押されたら途中終了
-            #if cv2.waitKey(25) & 0xFF == ord('q'):
-            #   break
-            time.sleep(0.1)
-        self.cap.release()
+                #if cv2.waitKey(25) & 0xFF == ord('q'):
+                #   break
+                
+                # chack per 5sec for ngrok. 
+                if time.time() - cc_checkpoint > self.dt_check:
+                    cc_checkpoint = time.time()
+                    received_text = self.cc.check()
+                    if received_text == 'stop':
+                        wc.forward(duty=0)
+                        break
+                    
+                time.sleep(self.dt)
+            self.cap.release()
         # cv2.destroyAllWindows()
-
+        elif received_text == 'stop':
+            None
+        else:
+            None
