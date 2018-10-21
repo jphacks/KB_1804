@@ -77,6 +77,9 @@ Techてく Clovaはユーザに寄り添ってくれるので、もはや家族�
 
 ### 独自開発技術（Hack Dayで開発したもの）
 2日間に開発した独自の機能・技術
+
+![システム図](https://github.com/jphacks/KB_1804/blob/master/tech_clova_system.png?raw=true)
+
 * Webカメラを用いた人物認識、位置推定
 * Clovaへの声をトリガーとして、ClovaのAPIを用いて、システム起動、制御
 * サーバーを介して、Raspberry Piが情報を受信
