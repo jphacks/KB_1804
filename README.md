@@ -55,9 +55,11 @@ Techてく Clovaはユーザに寄り添ってくれるので、もはや家族�
 今回スポンサーから提供されたAPI、製品などの外部技術があれば記述をして下さい。
 * Clova Extensions Kit
 
-#### フレームワーク・ライブラリ・モジュール
-* OpenCV
-* Keras
+#### フレームワーク・ライブラリ・モジュール*
+* OpenCV3
+* Pytorch
+* Numpy
+* YoloV3
 * Express
 
 #### デバイス
