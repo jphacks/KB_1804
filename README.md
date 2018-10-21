@@ -1,6 +1,6 @@
 # Techてく Clova
 
-![product name]
+[![Techてく Clova](image.png)](https://drive.google.com/open?id=1jRFcN5NUs_d0dKms6DadkSnS6t0W8Vrw)
 
 ## 製品概要
 
